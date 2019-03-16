@@ -1,5 +1,8 @@
 package com.example.ubicomp.checkinoutsystem;
 
+import android.app.AlarmManager;
+import android.content.Context;
+import android.content.IntentFilter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.Manifest;
@@ -20,17 +23,20 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Map;
+
 import android.app.PendingIntent;
 import android.widget.Toast;
-
 
 
 public class MainActivity extends AppCompatActivity {
@@ -43,13 +49,16 @@ public class MainActivity extends AppCompatActivity {
     private GeofencingClient geofencingClient;
     private PendingIntent geofencePendingIntent;
 
+    private LocationManager locationManager;
+
+
     private DatabaseManager db;
     private SharedPreferences sp;
 
     /**
      * Activity elements' variables
      */
-    public  EditText username;
+    public EditText username;
     private EditText password;
     private Button login;
     private CheckBox remember;
@@ -64,6 +73,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            Toast.makeText(MainActivity.this, "Your GPS is OFF! Turn it on to use all app facilities! ", Toast.LENGTH_LONG).show();
+        }
         //Initialize the geofencing client
         geofencingClient = LocationServices.getGeofencingClient(this);
         // Empty list for storing geofences
@@ -73,12 +86,16 @@ public class MainActivity extends AppCompatActivity {
         //Add the geofences
         addGeofences();
 
+
         username = findViewById(R.id.userText);
         password = findViewById(R.id.passwordText);
         login = findViewById(R.id.loginButton);
         remember = findViewById(R.id.rememberMe);
         db = new DatabaseManager(this);
         sp = getSharedPreferences("Login", MODE_PRIVATE);
+
+        Util.startReminderService(this);
+
 
 
         /**
@@ -88,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
             checkPermission();
             db.populateDatabase(); // For prototype only (populate the database to test the application)
             sp.edit().putBoolean("first-access",true).apply();
-         }
+        }
 
         /**
          * If the user checked in the past the remember box (and there wasn't a logout action)
@@ -179,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
     private void addGeofences(){
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED){
-            Toast.makeText(this,"To can use all app facilities you have to grant the location permission for this app!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"To can use all app facilities you have to grant the location permission for this app and turn on the GPS!", Toast.LENGTH_SHORT).show();
         }
         else
             geofencingClient.addGeofences(getGeofencingRequest(),getGeofencePendingIntent())

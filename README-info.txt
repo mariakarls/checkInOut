@@ -1,3 +1,7 @@
+UPDATE - 16/03/2019
+Added Remind notification. It is sent only when there's a user stored in the file SharedPreferences, this means only after that the user clicked on the remember me option during the login. For now it is sent 10 minutes before the CheckOutTime chosen. 
+
+UPDATE - 15/03/2019
 To add a new geofence area to monitorate:
 1. go to Constants file
 2. add a new Landmark with correct coordinates

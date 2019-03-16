@@ -63,9 +63,8 @@ public class NotificationService extends IntentService {
             }else {
                 //TO DO: open list selection activity
             }
-
-
         }
+
         NotificationManagerCompat.from(this).cancel(1); //Cancel the notification after the user click
 
 

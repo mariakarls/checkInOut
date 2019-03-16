@@ -3,6 +3,7 @@
     package="com.example.ubicomp.checkinoutsystem">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -21,7 +22,21 @@
         </activity>
 
         <service android:name=".NotificationService" />
-        <service android:name=".GeofenceTransitionIntentService" />
+        <service android:enabled="true" android:name=".GeofenceTransitionIntentService" />
+        <service
+            android:name=".ReminderJobService"
+            android:label="Word service"
+            android:permission="android.permission.BIND_JOB_SERVICE" >
+        </service>
+        <receiver android:name=".ReminderService" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
+
+
+
     </application>
 
 </manifest>
